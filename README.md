@@ -14,10 +14,12 @@ Honestly i hate electron based applications, even if you are running any chromiu
 
 > Note you will need chromium based browser to install this
 
-1. Download the slack-pwa.zip file from release page.
-2. Extract is some where
+1. Download the slack-pwa.zip file from [release](https://github.com/gxanshu/slack-pwa/releases/tag/release) page.
+2. Extract it some where
 3. Open your browser. go to menu (the three lines)
 4. Click on Extensions
 5. Click the **Developer mode** checkbox and then click the button labeled **Load unpacked extension…**
 6. Choose extract folder & load
-7. Open slack web version
+7. Open slack web version. hard reload it (**CTRL + SHIFT + R**)
+8. if still not works then clear all the cache & cookies of slack and login again.
+9. you will see install PWA button. just install and ready to go
