@@ -332,6 +332,20 @@
       "sizes": "256x256"
     }
   ],
+  "screenshots": [
+    {
+      "src": "https://lh3.googleusercontent.com/irYI_Z9X01H4PFUuPC-RbgXSB7P0pJjQ7xxOhXCXgi9k1uO3kfGeXCetTsori3pV5r_2NBxkQkDa_oZaTbj3p-zFIA=s1280-w1280-h800",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "https://play-lh.googleusercontent.com/gLmpFAWgXLX5GOcNTXv38WNvBhflpUT7ijyQwtt5GD5lTG8A8BKVzFQQ-erhVDT4Lg",
+      "sizes": "256x512",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
   "permissions": [],
   "categories": ["productivity", "collaboration"],
   "orientation": "any",
