@@ -340,8 +340,8 @@
       "form_factor": "wide"
     },
     {
-      "src": "https://play-lh.googleusercontent.com/gLmpFAWgXLX5GOcNTXv38WNvBhflpUT7ijyQwtt5GD5lTG8A8BKVzFQQ-erhVDT4Lg",
-      "sizes": "256x512",
+      "src": "https://dummyimage.com/320x512/000/fff&text=slack+mobile",
+      "sizes": "320x512",
       "type": "image/png",
       "form_factor": "narrow"
     }
