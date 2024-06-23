@@ -2,7 +2,7 @@
   "name": "Slack",
   "short_name": "Slack",
   "description": "Slack brings the team together, wherever you are.",
-  "start_url": "https://app.slack.com/client/*",
+  "start_url": "https://app.slack.com/client/",
   "display": "standalone",
   "background_color": "#4A154B",
   "theme_color": "#4A154B",
@@ -335,6 +335,5 @@
   "permissions": [],
   "categories": ["productivity", "collaboration"],
   "orientation": "any",
-  "display_override": ["window-controls-overlay", "minimal-ui"],
-  "scope": "/"
+  "display_override": ["window-controls-overlay", "minimal-ui"]
 }
