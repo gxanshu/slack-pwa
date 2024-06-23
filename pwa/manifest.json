@@ -1,7 +1,7 @@
 {
   "name": "Slack",
   "short_name": "Slack",
-  "start_url": "https://app.slack.com/client/",
+  "start_url": "https://app.slack.com/client",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#4A154B",
