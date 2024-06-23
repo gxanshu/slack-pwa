@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Slack PWA",
+  "version": "1.0",
+  "icons": {
+    "16": "assets/Square44x44Logo.targetsize-16.png",
+    "48": "assets/Square44x44Logo.targetsize-48.png",
+    "128": "assets/Square150x150Logo.scale-125.png"
+  },
+  "author": "Anshu Meena <anshu@frimware.in>",
+  "permissions": ["tabs", "scripting"],
+  "content_scripts": [
+    {
+      "matches": ["*://app.slack.com/*"],
+      "js": ["src/content.js"]
+    }
+  ]
+}
