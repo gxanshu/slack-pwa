@@ -8,6 +8,10 @@
   "theme_color": "#4A154B",
   "icons": [
     {
+      "src": "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/assets/144x144.png",
+      "sizes": "144x144"
+    },
+    {
       "src": "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/assets/SmallTile.scale-100.png",
       "sizes": "71x71"
     },
