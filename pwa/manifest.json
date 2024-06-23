@@ -8,37 +8,37 @@
   "theme_color": "#4A154B",
   "icons": [
     {
-      "src": "assets/72x72.png",
+      "src": "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/assets/72x72.png",
       "sizes": "72x72",
       "type": "image/png"
     },
     {
-      "src": "assets/96x96.png",
+      "src": "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/assets/96x96.png",
       "sizes": "96x96",
       "type": "image/png"
     },
     {
-      "src": "assets/128x128.png",
+      "src": "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/assets/128x128.png",
       "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "assets/144x144.png",
+      "src": "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/assets/144x144.png",
       "sizes": "144x144",
       "type": "image/png"
     },
     {
-      "src": "assets/152x152.png",
+      "src": "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/assets/152x152.png",
       "sizes": "152x152",
       "type": "image/png"
     },
     {
-      "src": "assets/192x192.png",
+      "src": "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/assets/192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "assets/512x512.png",
+      "src": "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/assets/512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
