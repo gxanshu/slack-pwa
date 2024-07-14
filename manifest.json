@@ -9,7 +9,6 @@
     "128": "assets/128x128.png"
   },
   "author": "Anshu Meena <anshu@frimware.in>",
-  "permissions": ["tabs", "scripting"],
   "content_scripts": [
     {
       "matches": ["*://app.slack.com/*"],
