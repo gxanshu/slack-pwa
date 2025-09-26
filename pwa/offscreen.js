@@ -7,7 +7,7 @@ function init() {
   try {
     audio = new Audio(chrome.runtime.getURL("assets/notify.mp3"));
     audio.preload = "auto";
-    audio.volume = 0.8;
+    audio.volume = 1.0;
 
     // Add event listeners for better debugging
     audio.addEventListener("canplaythrough", () => {
