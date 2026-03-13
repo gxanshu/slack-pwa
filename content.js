@@ -1,120 +1,68 @@
 /**
- * insert PWA manifest JSON
+ * Slack PWA - Content Script
+ * Injects PWA manifest and monitors Slack for unread notifications.
  */
-const metaLink = document.createElement("link");
-metaLink.setAttribute("rel", "manifest");
-metaLink.setAttribute(
-  "href",
-  "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/pwa/pwa-manifest.json",
-);
-document.head.appendChild(metaLink);
+
+// Inject PWA manifest so Slack can be installed as a standalone app
+const manifestLink = document.createElement("link");
+manifestLink.rel = "manifest";
+manifestLink.href =
+  "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/pwa/pwa-manifest.json";
+document.head.appendChild(manifestLink);
 
 /**
- * Monitor title changes for notification sounds
+ * Extract unread notification count from Slack's document title.
+ * Slack uses patterns like "(3) Slack", "3 channel", "[3] Slack", or "\u2022 Slack".
+ * Returns: positive number for count, 0 for indicator-only, -1 for none.
  */
-let previousTitle = document.title;
-let hasUnreadMessages = false;
-let isExtensionReady = false;
-
-// Function to check if title contains notification indicators
-function hasNotificationInTitle(title) {
-  // Check for patterns like "(1) Slack", "(2) Channel Name", "• Slack", etc.
-  const notificationPatterns = [
-    /^\(\d+\)/, // (1) pattern
-    /^\d+\s/, // "1 " pattern
-    /^•/, // bullet point pattern
-    /^\[\d+\]/, // [1] pattern
-  ];
-  return notificationPatterns.some((pattern) => pattern.test(title.trim()));
+function getNotificationCount(title) {
+  const t = title.trim();
+  const m =
+    t.match(/^\((\d+)\)/) || t.match(/^(\d+)\s/) || t.match(/^\[(\d+)\]/);
+  if (m) return parseInt(m[1], 10);
+  if (t.startsWith("\u2022")) return 0;
+  return -1;
 }
 
-// Function to handle title changes
-function onTitleChange() {
-  const currentTitle = document.title;
+let lastCount = -1;
 
-  if (!isExtensionReady) {
-    console.log("Slack PWA: Extension not ready yet, skipping notification");
-    previousTitle = currentTitle;
-    return;
-  }
+function checkTitle() {
+  const count = getNotificationCount(document.title);
+  if (count === lastCount) return;
 
-  // Check if we now have notifications when we didn't before
-  const currentHasNotifications = hasNotificationInTitle(currentTitle);
-  const previousHasNotifications = hasNotificationInTitle(previousTitle);
+  const wasQuiet = lastCount < 0;
+  lastCount = count;
 
-  console.log("Slack PWA: Title change detected", {
-    previous: previousTitle,
-    current: currentTitle,
-    currentHasNotifications,
-    previousHasNotifications,
-  });
-
-  // Only play sound when transitioning from no notifications to having notifications
-  if (currentHasNotifications && !previousHasNotifications) {
-    console.log(
-      "Slack PWA: New notification detected, sending ping to service worker",
-    );
-    // Send message to service worker to play notification sound
-    chrome.runtime.sendMessage({ type: "SLACK_UNREAD_PING" }).catch((error) => {
-      console.error(
-        "Slack PWA: Failed to send message to service worker:",
-        error,
-      );
-    });
-  }
-
-  hasUnreadMessages = currentHasNotifications;
-  previousTitle = currentTitle;
+  chrome.runtime
+    .sendMessage({
+      type: "NOTIFICATION_UPDATE",
+      count,
+      playSound: count >= 0 && wasQuiet,
+    })
+    .catch(() => {});
 }
 
-// Wait for page to be fully loaded before starting to monitor
-function initializeNotificationMonitoring() {
-  console.log("Slack PWA: Initializing notification monitoring");
+function init() {
+  lastCount = getNotificationCount(document.title);
 
-  // Set up MutationObserver to watch for title changes
-  const titleObserver = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (
-        mutation.type === "childList" &&
-        mutation.target.nodeName === "TITLE"
-      ) {
-        onTitleChange();
-      }
-    });
-  });
+  // Send initial badge state to service worker
+  chrome.runtime
+    .sendMessage({ type: "NOTIFICATION_UPDATE", count: lastCount })
+    .catch(() => {});
 
-  // Observe the title element for changes
-  const titleElement = document.querySelector("title");
-  if (titleElement) {
-    titleObserver.observe(titleElement, {
+  // Watch <title> element for mutations
+  const titleEl = document.querySelector("title");
+  if (titleEl) {
+    new MutationObserver(checkTitle).observe(titleEl, {
       childList: true,
       subtree: true,
       characterData: true,
     });
-    console.log("Slack PWA: Title observer attached");
   }
 
-  // Also use a fallback method to check title periodically
-  setInterval(() => {
-    if (document.title !== previousTitle) {
-      onTitleChange();
-    }
-  }, 1000);
-
-  // Initialize with current title state
-  hasUnreadMessages = hasNotificationInTitle(document.title);
-  isExtensionReady = true;
-  console.log(
-    "Slack PWA: Notification monitoring initialized with title:",
-    document.title,
-  );
+  // Fallback poll in case the observer misses a change
+  setInterval(checkTitle, 1000);
 }
 
-// Initialize when DOM is ready and Slack has loaded
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(initializeNotificationMonitoring, 2000);
-  });
-} else {
-  setTimeout(initializeNotificationMonitoring, 2000);
-}
+// Delay init to let Slack's SPA finish loading
+setTimeout(init, 2000);
