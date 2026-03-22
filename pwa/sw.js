@@ -1,16 +1,22 @@
 /**
  * Slack PWA - Service Worker
- * Updates the PWA app badge and plays notification sounds.
+ * Updates the extension icon badge and plays notification sounds.
+ * The primary PWA badge is set by badge.js (MAIN world content script).
+ * This service worker provides a fallback badge + extension icon badge.
  */
 
-// Update the PWA badge by injecting into the page's MAIN world.
-// This guarantees the Badging API targets the installed PWA, not the extension.
-async function updateBadge(tabId, count) {
+const BADGE_COLOR = "#E01E5A";
+
+// Fallback: inject badge update into MAIN world via scripting API.
+// Primary badge is set by badge.js content script; this covers edge cases
+// where the MAIN world content script hasn't loaded yet.
+async function updatePwaBadge(tabId, count) {
   try {
     await chrome.scripting.executeScript({
       target: { tabId },
       world: "MAIN",
       func: (c) => {
+        if (typeof navigator.setAppBadge !== "function") return;
         if (c > 0) navigator.setAppBadge(c).catch(() => {});
         else if (c === 0) navigator.setAppBadge().catch(() => {});
         else navigator.clearAppBadge().catch(() => {});
@@ -19,6 +25,25 @@ async function updateBadge(tabId, count) {
     });
   } catch {
     // Tab may have closed or navigated away
+  }
+}
+
+// Update the extension toolbar icon badge.
+// This serves as a visible fallback on platforms where navigator.setAppBadge()
+// doesn't produce OS-level badges (e.g. Linux/GNOME).
+function updateExtensionBadge(tabId, count) {
+  try {
+    if (count > 0) {
+      chrome.action.setBadgeText({ text: String(count), tabId });
+      chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR, tabId });
+    } else if (count === 0) {
+      chrome.action.setBadgeText({ text: "•", tabId });
+      chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR, tabId });
+    } else {
+      chrome.action.setBadgeText({ text: "", tabId });
+    }
+  } catch {
+    // action API may not be available
   }
 }
 
@@ -45,6 +70,7 @@ async function playSound() {
 chrome.runtime.onMessage.addListener((msg, sender) => {
   if (msg?.type !== "NOTIFICATION_UPDATE" || !sender.tab?.id) return;
 
-  updateBadge(sender.tab.id, msg.count);
+  updatePwaBadge(sender.tab.id, msg.count);
+  updateExtensionBadge(sender.tab.id, msg.count);
   if (msg.playSound) playSound();
 });

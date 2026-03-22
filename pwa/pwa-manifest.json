@@ -2,6 +2,7 @@
   "name": "Slack",
   "short_name": "Slack",
   "start_url": "https://app.slack.com/client",
+  "scope": "https://app.slack.com/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#4A154B",

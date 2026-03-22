@@ -9,6 +9,7 @@
     "48": "assets/48x48.png",
     "128": "assets/128x128.png"
   },
+  "action": {},
   "permissions": ["offscreen", "scripting"],
   "host_permissions": ["*://app.slack.com/*"],
   "background": {
@@ -20,6 +21,12 @@
       "matches": ["*://app.slack.com/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://app.slack.com/*"],
+      "js": ["badge.js"],
+      "run_at": "document_idle",
+      "world": "MAIN"
     }
   ],
   "web_accessible_resources": [

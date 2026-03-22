@@ -4,6 +4,9 @@
  */
 
 const MIN_GAP_MS = 2000;
+const AUDIO_LOAD_DELAY_MS = 100;
+const AUDIO_REINIT_DELAY_MS = 1000;
+
 let audio;
 let lastPlay = 0;
 let ready = false;
@@ -21,7 +24,7 @@ async function play() {
 
   if (!audio || !ready) {
     initAudio();
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((resolve) => setTimeout(resolve, AUDIO_LOAD_DELAY_MS));
   }
 
   lastPlay = Date.now();
@@ -30,7 +33,7 @@ async function play() {
     await audio.play();
   } catch {
     ready = false;
-    setTimeout(initAudio, 1000);
+    setTimeout(initAudio, AUDIO_REINIT_DELAY_MS);
   }
 }
 

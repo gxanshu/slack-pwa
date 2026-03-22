@@ -3,25 +3,40 @@
  * Injects PWA manifest and monitors Slack for unread notifications.
  */
 
+const MANIFEST_URL =
+  "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/pwa/pwa-manifest.json";
+const INIT_DELAY_MS = 2000;
+const POLL_INTERVAL_MS = 1000;
+
 // Inject PWA manifest so Slack can be installed as a standalone app
 const manifestLink = document.createElement("link");
 manifestLink.rel = "manifest";
-manifestLink.href =
-  "https://raw.githubusercontent.com/gxanshu/slack-pwa/main/pwa/pwa-manifest.json";
+manifestLink.href = MANIFEST_URL;
 document.head.appendChild(manifestLink);
 
 /**
  * Extract unread notification count from Slack's document title.
- * Slack uses patterns like "(3) Slack", "3 channel", "[3] Slack", or "\u2022 Slack".
+ * Slack uses patterns like "(3) Slack", "3 channel", "[3] Slack", or "• Slack".
  * Returns: positive number for count, 0 for indicator-only, -1 for none.
  */
 function getNotificationCount(title) {
-  const t = title.trim();
-  const m =
-    t.match(/^\((\d+)\)/) || t.match(/^(\d+)\s/) || t.match(/^\[(\d+)\]/);
-  if (m) return parseInt(m[1], 10);
-  if (t.startsWith("\u2022")) return 0;
+  const trimmedTitle = title.trim();
+  const countMatch =
+    trimmedTitle.match(/^\((\d+)\)/) ||
+    trimmedTitle.match(/^(\d+)\s/) ||
+    trimmedTitle.match(/^\[(\d+)\]/);
+  if (countMatch) return parseInt(countMatch[1], 10);
+  if (trimmedTitle.startsWith("\u2022")) return 0;
   return -1;
+}
+
+/**
+ * Set the PWA badge by communicating with the MAIN world badge.js script.
+ * Uses a DOM attribute + custom event to cross the isolated/MAIN world boundary.
+ */
+function setBadge(count) {
+  document.documentElement.setAttribute("data-badge-count", String(count));
+  document.documentElement.dispatchEvent(new Event("slack-pwa-badge"));
 }
 
 let lastCount = -1;
@@ -33,6 +48,10 @@ function checkTitle() {
   const wasQuiet = lastCount < 0;
   lastCount = count;
 
+  // Set PWA badge directly via MAIN world script (immediate, no roundtrip)
+  setBadge(count);
+
+  // Notify service worker for sound playback and extension icon badge
   chrome.runtime
     .sendMessage({
       type: "NOTIFICATION_UPDATE",
@@ -45,7 +64,10 @@ function checkTitle() {
 function init() {
   lastCount = getNotificationCount(document.title);
 
-  // Send initial badge state to service worker
+  // Set initial badge state
+  setBadge(lastCount);
+
+  // Send initial state to service worker for extension icon badge
   chrome.runtime
     .sendMessage({ type: "NOTIFICATION_UPDATE", count: lastCount })
     .catch(() => {});
@@ -61,8 +83,8 @@ function init() {
   }
 
   // Fallback poll in case the observer misses a change
-  setInterval(checkTitle, 1000);
+  setInterval(checkTitle, POLL_INTERVAL_MS);
 }
 
 // Delay init to let Slack's SPA finish loading
-setTimeout(init, 2000);
+setTimeout(init, INIT_DELAY_MS);
