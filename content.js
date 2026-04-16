@@ -24,7 +24,8 @@ function getNotificationCount(title) {
   const countMatch =
     trimmedTitle.match(/^\((\d+)\)/) ||
     trimmedTitle.match(/^(\d+)\s/) ||
-    trimmedTitle.match(/^\[(\d+)\]/);
+    trimmedTitle.match(/^\[(\d+)\]/) ||
+    trimmedTitle.match(/\s+-\s+(\d+)\s+new\s+items?\s+-\s+/);
   if (countMatch) return parseInt(countMatch[1], 10);
   if (trimmedTitle.startsWith("\u2022")) return 0;
   return -1;
